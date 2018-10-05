@@ -17,7 +17,10 @@ DIRECTION=1   # 1=left 2=down 3=up 4=down
 declare -A board_array
 SNAKE_HEAD='0,0'
 SNAKE_TAIL='0,0'
+SNAKE_TAIL_PREV=''
 SNAKE_LEN=1
+SNAKE_BODY=''
+EATEN_APPLE=0
 
 function clearWindow() {
   tput sgr0    # Reset 'pen'
@@ -119,8 +122,23 @@ function cursor_to_tput () {
 
 }
 
+function drawApple() {
+
+  tput sc                                # Save current position
+  tput sgr0
+  tput setaf 1
+  tput cup 3 3
+  echo -n 'A'
+  tput sgr0
+  tput rc                                # restore cursor
+}
+
 function draw() {
   local r_direction=''
+
+  SNAKE_BODY="$CURSOR_X,$CURSOR_Y"
+
+  drawApple
 
   while true
   do
@@ -200,16 +218,34 @@ function draw() {
       drawGame
     fi
 
-  tput sc                                # Save current position
-  tput cup `cursor_to_tput $SNAKE_TAIL`  # Move cursor onto tail for deletion
-  tput sgr0
-  tput ech 1                             # Delete old tail position
-  #echo -n 'B'
-  tput rc                                # restore cursor
-  tput setab 255
-  tput setaf 255
   SNAKE_HEAD="$CURSOR_X,$CURSOR_Y"
-  SNAKE_TAIL="$CURSOR_X,$CURSOR_Y"
+  # If we land on an apple
+  if [[ $CURSOR_X = '3' && $CURSOR_Y = '3' ]]
+  then
+    EATEN_APPLE=1
+    let SNAKE_LEN=$SNAKE_LEN+1
+
+    SNAKE_BODY="$SNAKE_BODY"
+
+    # In this case we let the snake grow
+  else
+    if [ $EATEN_APPLE -eq 1 ]
+    then
+      EATEN_APPLE=0
+    else
+    # Move the snake
+      SNAKE_TAIL=`echo $SNAKE_BODY | head -1`
+      tput sc                                # Save current position
+      tput cup `cursor_to_tput $SNAKE_TAIL`  # Move cursor onto tail for deletion
+      tput sgr0                              # Delete the old tail
+      tput ech 1
+      tput rc                                # restore cursor
+      tput setab 255
+      tput setaf 255
+    fi
+  fi
+
+  SNAKE_BODY=`echo -e "$SNAKE_BODY\n$SNAKE_HEAD"|tail -$SNAKE_LEN`
 
   done
 }
