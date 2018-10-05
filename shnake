@@ -78,6 +78,8 @@ function drawGame() {
   # Determine game center
   CURSOR_X=$((WINDOW_WIDTH/2))
   CURSOR_Y=$((WINDOW_HEIGHT/2))
+  SNAKE_HEAD="$CURSOR_X,$CURSOR_Y"
+  SNAKE_TAIL="$CURSOR_X,$CURSOR_Y"
   clearWindow
 
   # Set border colour
@@ -102,6 +104,19 @@ function drawGame() {
   tput setaf 255
   echo -n ${MARK}
   tput cup ${CURSOR_Y} ${CURSOR_X}
+}
+
+# Convert cursor 
+# X,Y to Y X
+function cursor_to_tput () {
+  local x
+  local y
+
+  x=`echo $1 | cut -d',' -f 1`
+  y=`echo $1 | cut -d',' -f 2`
+
+  echo $y $x
+
 }
 
 function draw() {
@@ -184,6 +199,17 @@ function draw() {
       clearWindow
       drawGame
     fi
+
+  tput sc                                # Save current position
+  tput cup `cursor_to_tput $SNAKE_TAIL`  # Move cursor onto tail for deletion
+  tput sgr0
+  tput ech 1                             # Delete old tail position
+  #echo -n 'B'
+  tput rc                                # restore cursor
+  tput setab 255
+  tput setaf 255
+  SNAKE_HEAD="$CURSOR_X,$CURSOR_Y"
+  SNAKE_TAIL="$CURSOR_X,$CURSOR_Y"
 
   done
 }
