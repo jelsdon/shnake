@@ -21,6 +21,9 @@ SNAKE_TAIL_PREV=''
 SNAKE_LEN=1
 SNAKE_BODY=''
 EATEN_APPLE=0
+APPLE_LOC=''
+APPLE_LOC_X=''
+APPLE_LOC_Y=''
 
 function clearWindow() {
   tput sgr0    # Reset 'pen'
@@ -123,11 +126,14 @@ function cursor_to_tput () {
 }
 
 function drawApple() {
+  APPLE_LOC_X=$(( ( RANDOM % $((WINDOW_WIDTH-2)) ) + 1 ))
+  APPLE_LOC_Y=$(( ( RANDOM % $((WINDOW_HEIGHT-2)) ) + 1 ))
 
+  APPLE_LOC="$APPLE_LOC_X,$APPLE_LOC_Y"
   tput sc                                # Save current position
   tput sgr0
-  tput setaf 1
-  tput cup 3 3
+  tput setaf 9
+  tput cup $APPLE_LOC_Y $APPLE_LOC_X
   echo -n 'A'
   tput sgr0
   tput rc                                # restore cursor
@@ -220,7 +226,7 @@ function draw() {
 
   SNAKE_HEAD="$CURSOR_X,$CURSOR_Y"
   # If we land on an apple
-  if [[ $CURSOR_X = '3' && $CURSOR_Y = '3' ]]
+  if [[ $CURSOR_X = $APPLE_LOC_X && $CURSOR_Y = $APPLE_LOC_Y ]]
   then
     EATEN_APPLE=1
     let SNAKE_LEN=$SNAKE_LEN+1
@@ -232,17 +238,16 @@ function draw() {
     if [ $EATEN_APPLE -eq 1 ]
     then
       EATEN_APPLE=0
-    else
-    # Move the snake
-      SNAKE_TAIL=`echo $SNAKE_BODY | head -1`
-      tput sc                                # Save current position
-      tput cup `cursor_to_tput $SNAKE_TAIL`  # Move cursor onto tail for deletion
-      tput sgr0                              # Delete the old tail
-      tput ech 1
-      tput rc                                # restore cursor
-      tput setab 255
-      tput setaf 255
-    fi
+      drawApple
+  fi
+    SNAKE_TAIL=`echo $SNAKE_BODY | head -1`
+    tput sc                                # Save current position
+    tput cup `cursor_to_tput $SNAKE_TAIL`  # Move cursor onto tail for deletion
+    tput sgr0                              # Delete the old tail
+    tput ech 1
+    tput rc                                # restore cursor
+    tput setab 255
+    tput setaf 255
   fi
 
   SNAKE_BODY=`echo -e "$SNAKE_BODY\n$SNAKE_HEAD"|tail -$SNAKE_LEN`
