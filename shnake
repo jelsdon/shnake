@@ -171,6 +171,9 @@ function draw() {
         # Put cursor in new pos -- check if there's a 
         # replace mode for this
         tput cup ${CURSOR_Y} ${CURSOR_X}
+      else
+        # We hit the wall
+        exit
       fi
     fi
 
@@ -185,6 +188,9 @@ function draw() {
         # Put cursor in new pos -- check if there's a 
         # replace mode for this
         tput cup ${CURSOR_Y} ${CURSOR_X}
+      else
+        # We hit the will
+        exit
       fi
     fi
 
@@ -199,6 +205,9 @@ function draw() {
         # Put cursor in new pos -- check if there's a 
         # replace mode for this
         tput cup ${CURSOR_Y} ${CURSOR_X}
+      else
+        # We hit the will
+        exit
       fi
     fi
 
@@ -213,6 +222,9 @@ function draw() {
         # Put cursor in new pos -- check if there's a 
         # replace mode for this
         tput cup ${CURSOR_Y} ${CURSOR_X}
+      else
+        # We hit the will
+        exit
       fi
     fi
 
@@ -233,7 +245,7 @@ function draw() {
 
     SNAKE_BODY="$SNAKE_BODY"
 
-    # In this case we let the snake grow
+  # In this case we let the snake grow
   else
     if [ $EATEN_APPLE -eq 1 ]
     then
@@ -250,6 +262,7 @@ function draw() {
     tput setaf 255
   fi
 
+  # Update the snake data
   SNAKE_BODY=`echo -e "$SNAKE_BODY\n$SNAKE_HEAD"|tail -$SNAKE_LEN`
 
   done
