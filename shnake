@@ -141,6 +141,7 @@ function drawApple() {
 
 function draw() {
   local r_direction=''
+  local body_clash=0
 
   SNAKE_BODY="$CURSOR_X,$CURSOR_Y"
 
@@ -252,6 +253,21 @@ function draw() {
     tput rc                                # restore cursor
     tput setab 255
     tput setaf 255
+  fi
+
+  # Detect whether we have collided with ourself
+  while read -r r_body 2>/dev/null
+  do
+    if [ ${r_body} == ${SNAKE_HEAD} ]
+    then
+      body_clash=1
+      break
+    fi
+  done <<< "$SNAKE_BODY"
+
+  if [ $body_clash -eq 1 ]
+  then
+    exit
   fi
 
   # Update the snake data
