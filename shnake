@@ -228,14 +228,6 @@ function draw() {
       fi
     fi
 
-    # Shake up
-    if [ "${r_direction}" == "q" ]
-    then
-      tput sgr0    # Reset 'pen'
-      clearWindow
-      drawGame
-    fi
-
   SNAKE_HEAD="$CURSOR_X,$CURSOR_Y"
   # If we land on an apple
   if [[ $CURSOR_X = $APPLE_LOC_X && $CURSOR_Y = $APPLE_LOC_Y ]]
